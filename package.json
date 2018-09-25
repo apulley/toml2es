@@ -1,0 +1,10 @@
+{
+  "name": "wordkeep",
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "devDependencies": {
+    "concat-stream": "^1.6.2",
+    "toml": "^2.3.3"
+  }
+}
