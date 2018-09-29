@@ -1,1 +1,0 @@
-{"myPage":{"title":"My Page"}}
