@@ -14,6 +14,13 @@ glob('toml/*.toml', {
     buildModules(files, 'content',  myFunction);
 });
 
+/**
+ * Parse toml files from array of paths and output into a directory. 
+ *
+ * @param {Array} tomlPaths
+ * @param {String} dir
+ * @param {Function} callback
+ */
 function buildModules(tomlPaths, dir, callback){
   let files = [];
   var actions = tomlPaths.map(path => {
