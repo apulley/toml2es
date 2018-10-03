@@ -11,10 +11,10 @@ let contentJson = {};
 glob('toml/*.toml', {
   nodir: true,
 }, function(err, files){
-    buildModules(files, myFunction);
+    buildModules(files, 'content',  myFunction);
 });
 
-function buildModules(tomlPaths, callback){
+function buildModules(tomlPaths, dir, callback){
   let files = [];
   var actions = tomlPaths.map(path => {
     return new Promise(function(resolve, reject){
@@ -26,7 +26,7 @@ function buildModules(tomlPaths, callback){
         const fileName = path.match(rxFileName)[0];
 
         fs.writeFile(
-          `content/${fileName}.js`, 
+          `${dir}/${fileName}.js`, 
           `export default ${content}`, 
           {flag: 'w'}, 
           error => { 
@@ -42,10 +42,25 @@ function buildModules(tomlPaths, callback){
   });
   Promise.all(actions).then(() => {
     let jsonObj = {};
+    let json = '';
     files.forEach( jsModule => {
       jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
     });
-    callback(jsonObj);
+    json = beautify(
+      JSON.stringify(jsonObj),
+      { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
+    );
+    fs.writeFile(
+      `${dir}/content.json`, 
+      json, 
+      {flag: 'w'}, 
+      error => { 
+        if (error) {
+          callback(jsonObj);
+          console.log('error');
+        }
+      }
+    );
   });
 }
 

@@ -1,0 +1,12 @@
+{
+  "actions": {
+    "forms": {
+      "continue": "Please Continue"
+    }
+  },
+  "page": {
+    "myPage": {
+      "title": "My Page"
+    }
+  }
+}
