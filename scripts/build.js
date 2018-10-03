@@ -43,7 +43,9 @@ function buildModules(tomlPaths, dir, callback){
   Promise.all(actions).then(() => {
     let jsonObj = {};
     let json = '';
+    let moduleExport = '';
     files.forEach( jsModule => {
+      moduleExport += `export { default as ${jsModule.fileName} } from './${jsModule.fileName}.js'\n`;
       jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
     });
     json = beautify(
@@ -51,16 +53,27 @@ function buildModules(tomlPaths, dir, callback){
       { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
     );
     fs.writeFile(
-      `${dir}/content.json`, 
-      json, 
+      `${dir}/index.js`, 
+      moduleExport,
       {flag: 'w'}, 
-      error => { 
+      error => {
         if (error) {
-          callback(jsonObj);
           console.log('error');
         }
       }
     );
+    fs.writeFile(
+      `${dir}/content.json`, 
+      json, 
+      {flag: 'w'}, 
+      error => {
+        callback(jsonObj);
+        if (error) {
+          console.log('error');
+        }
+      }
+    );
+
   });
 }
 
