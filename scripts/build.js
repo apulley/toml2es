@@ -23,7 +23,7 @@ glob('toml/*.toml', {
  */
 function buildModules(tomlPaths, dir, callback){
   let files = [];
-  var actions = tomlPaths.map(path => {
+  const actions = tomlPaths.map(path => {
     return new Promise(function(resolve, reject){
       fs.createReadStream(path, 'utf8').pipe(concat( data => {
         let content = beautify(
@@ -31,7 +31,9 @@ function buildModules(tomlPaths, dir, callback){
           { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
         );
         const fileName = path.match(rxFileName)[0];
-
+        if (!fs.existsSync(dir)){
+          fs.mkdirSync(dir);
+        }
         fs.writeFile(
           `${dir}/${fileName}.js`, 
           `export default ${content}`, 
@@ -51,6 +53,7 @@ function buildModules(tomlPaths, dir, callback){
     let jsonObj = {};
     let json = '';
     let moduleExport = '';
+    
     files.forEach( jsModule => {
       moduleExport += `export { default as ${jsModule.fileName} } from './${jsModule.fileName}.js'\n`;
       jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
@@ -85,6 +88,6 @@ function buildModules(tomlPaths, dir, callback){
 }
 
 function myFunction(data){
-  console.log(data);
+  console.log('done', data);
 }
  
