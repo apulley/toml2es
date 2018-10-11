@@ -1,4 +1,9 @@
 {
+  "actions._es": {
+    "forms": {
+      "continue": "Please Continue"
+    }
+  },
   "actions": {
     "forms": {
       "continue": "Please Continue"

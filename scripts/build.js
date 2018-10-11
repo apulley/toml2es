@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const concat = require('concat-stream');
 const glob = require('glob');
-const toml = require('toml');
+const toml = require('@iarna/toml');
 const beautify = require('js-beautify').js;
 
 const rxFileName = /([^\/]+)(?=\.\w+$)/;
@@ -90,4 +90,3 @@ function buildModules(tomlPaths, dir, callback){
 function myFunction(data){
   console.log('done', data);
 }
- 
