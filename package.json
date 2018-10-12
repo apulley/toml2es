@@ -1,7 +1,8 @@
 {
   "name": "wordkeep",
   "scripts": {
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "prefix": "node scripts/prefix.js"
   },
   "devDependencies": {
     "@iarna/toml": "^2.2.0",
