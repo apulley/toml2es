@@ -7,19 +7,23 @@ const beautify = require('js-beautify').js;
 
 const rxFileName = /([^\/]+)(?=\.\w+$)/;
 let contentJson = {};
+let localization = [];
 
-console.log(process.argv[2]);
+//console.log(process.argv[2]);
 
 glob('toml/*.toml', {
   nodir: true,
 }, function(err, files){
-    console.log(files)
-    let parsedFiles = files.map( str => { 
+    //console.log(files)
+    let parsedFiles = files.filter( str => { 
       let parts = str.split('/');
-      console.log(parts[parts.length-1]);
-      return parts[parts.length-1].match(/^(.*)(_.*?)$/) ? parts[parts.length-1].match(/^(.*)(_.*?)$/)[1] : '';
+      if(parts[parts.length-1].match(/^(.*)(_.*?)$/) && localization.indexOf(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]) === -1){
+        localization.push(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]);
+      }
+      return parts[parts.length-1].match(/^(.*)(_.*?)$/) ? false : true;
     });
-    console.log(parsedFiles)
+    //console.log(parsedFiles)
+    console.log(localization)
     //buildModules(files.filter(str => {str.match(/^(.*)(_.*?)$/)[1]}), 'content',  myFunction);
 });
 
