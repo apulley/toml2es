@@ -68,6 +68,7 @@ function buildModules(tomlPaths, options){
             });
           });
           Promise.all(writeTomlTable).then((arr) => {
+            //console.log(arr)
             resolve(arr);
           });
         } else{
@@ -86,14 +87,23 @@ function buildModules(tomlPaths, options){
       }));
     });
   });
-  Promise.all(writeToml).then((files) => {
+  Promise.all(writeToml).then((arr) => {
     let jsonObj = {};
     let json = '';
     let moduleExport = '';
-    console.log(files)
+    let files = [];
+
+    arr.forEach((file)=>{
+      if(file.length > 1){
+        file.forEach((tableFile)=>{files.push(tableFile)});
+      } else{
+        files.push(file);
+      }
+    });
+    
     files.forEach( (jsModule) => {
      // console.log(jsModule);
-      moduleExport += `export { default as ${jsModule[0]} } from './${jsModule[0]}.js'\n`;
+      moduleExport += `export { default as ${(jsModule.length > 1) ? jsModule[0]+jsModule[1].charAt(0).toUpperCase() + jsModule[1].slice(1) : jsModule[0]} } from './${(jsModule.length > 1) ? jsModule[0] + '/' + jsModule[1] : jsModule[0]}.js'\n`;
       //jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
     });
     // json = beautify(
