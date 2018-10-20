@@ -1,5 +1,4 @@
-const fs = require('fs-extra');
-const gfs = require('graceful-fs');
+const fs = require('fs');
 const rimraf = require('rimraf');
 const path = require('path');
 const concat = require('concat-stream');
@@ -7,8 +6,7 @@ const glob = require('glob');
 const toml = require('@iarna/toml');
 const beautify = require('js-beautify').js;
 
-
-rimraf('content',()=>{
+rimraf('content', () => {
   glob('toml/*.toml', {
     nodir: true,
   }, function(err, files){
@@ -52,9 +50,7 @@ function buildModules(tomlPaths, options){
         }
 
         if(fileMatch){
-          //console.log('here', content);
           const writeTomlTable = Object.keys(JSON.parse(content)).map((table) => {
-            //console.log(table)
             return new Promise(function(resolve, reject){
               const tableContent = beautify(`${JSON.stringify( JSON.parse(content)[table] )}`,{ end_with_newline: true, indent_size: 2, space_in_empty_paren: true});
               fs.writeFile(
@@ -71,7 +67,6 @@ function buildModules(tomlPaths, options){
             });
           });
           Promise.all(writeTomlTable).then((arr) => {
-            //console.log(arr)
             resolve(arr);
           });
         } else{
@@ -97,46 +92,27 @@ function buildModules(tomlPaths, options){
     let files = [];
 
     arr.forEach((file)=>{
-      if(file.length > 1){
+      if(Array.isArray(file[0])){
         file.forEach((tableFile)=>{files.push(tableFile)});
       } else{
         files.push(file);
       }
     });
-    
+    //console.log(files)
     files.forEach( (jsModule) => {
-     // console.log(jsModule);
+      //console.log(jsModule)
       moduleExport += `export { default as ${(jsModule.length > 1) ? jsModule[0]+jsModule[1].charAt(0).toUpperCase() + jsModule[1].slice(1) : jsModule[0]} } from './${(jsModule.length > 1) ? jsModule[0] + '/' + jsModule[1] : jsModule[0]}.js'\n`;
-      //jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
     });
-    // json = beautify(
-    //   JSON.stringify(jsonObj),
-    //   { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
-    // );
     fs.writeFile(
       `${directory}/index.js`, 
       moduleExport,
       {flag: 'w'}, 
       error => {
         if (error) {
-         // console.log('error');
+          console.log('error');
         }
       }
     );
-    // fs.writeFile(
-    //   `${directory}/content.json`, 
-    //   json, 
-    //   {flag: 'w'}, 
-    //   error => {
-    //     if(complete){
-    //       complete(jsonObj)
-    //     }
-    //     if (error) {
-    //       //console.log('error');
-    //     }
-    //   }
-    // );
-
   });
 }
 
