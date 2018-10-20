@@ -1,5 +1,6 @@
 export default {
   "forms": {
-    "continue": "Please Continue"
+    "continue": "Please Continue",
+    "submit": "Submit"
   }
 }

@@ -11,21 +11,27 @@ let localization = [];
 
 //console.log(process.argv[2]);
 
-glob('toml/*.toml', {
-  nodir: true,
-}, function(err, files){
-    //console.log(files)
-    let parsedFiles = files.filter( str => { 
-      let parts = str.split('/');
-      if(parts[parts.length-1].match(/^(.*)(_.*?)$/) && localization.indexOf(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]) === -1){
-        localization.push(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]);
+function getFiles(prefix = true){
+  glob('toml/*.toml', {
+    nodir: true,
+  }, function(err, files){
+      //console.log(files)
+      if(prefix){
+        let parsedFiles = files.filter( str => { 
+          let parts = str.split('/');
+          if(parts[parts.length-1].match(/^(.*)(_.*?)$/) && localization.indexOf(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]) === -1){
+            localization.push(parts[parts.length-1].match(/^(.*)(_.*?)$/)[1]);
+          }
+          return parts[parts.length-1].match(/^(.*)(_.*?)$/) ? false : true;
+        });
       }
-      return parts[parts.length-1].match(/^(.*)(_.*?)$/) ? false : true;
-    });
-    //console.log(parsedFiles)
-    console.log(localization)
-    //buildModules(files.filter(str => {str.match(/^(.*)(_.*?)$/)[1]}), 'content',  myFunction);
-});
+      console.log(parsedFiles)
+      console.log(localization)
+      //buildModules(files.filter(str => {str.match(/^(.*)(_.*?)$/)[1]}), 'content',  myFunction);
+  });
+}
+
+// TODO: Object.keys of the master file, then compare Object.keys of the prefixed files. add them in the js/object/json then turn it into TOML 
 
 // /**
 //  * Parse toml files from array of paths and output into a directory. 

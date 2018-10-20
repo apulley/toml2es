@@ -5,24 +5,23 @@ const glob = require('glob');
 const toml = require('@iarna/toml');
 const beautify = require('js-beautify').js;
 
-const rxFileName = /([^\/]+)(?=\.\w+$)/;
-let contentJson = {};
-
 glob('toml/*.toml', {
   nodir: true,
 }, function(err, files){
-    buildModules(files, 'content',  myFunction);
+    buildModules(files, {directory: 'content', complete: myFunction, tablesAsModules:['page']});
 });
 
 /**
  * Parse toml files from array of paths and output into a directory. 
  *
  * @param {Array} tomlPaths
- * @param {String} dir
- * @param {Function} callback
+ * @param {directory: String, tablesAsModules: Array, complete: Function} options
  */
-function buildModules(tomlPaths, dir, callback){
+function buildModules(tomlPaths, options){
+  let { directory = null, tablesAsModules = [], complete = null } = options;
+  const rxFileName = /([^\/]+)(?=\.\w+$)/;
   let files = [];
+
   const actions = tomlPaths.map(path => {
     return new Promise(function(resolve, reject){
       fs.createReadStream(path, 'utf8').pipe(concat( data => {
@@ -30,12 +29,28 @@ function buildModules(tomlPaths, dir, callback){
           `${JSON.stringify(toml.parse(data))}`,
           { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
         );
+        let tableModule = {};
+        let fileMatch = false;
         const fileName = path.match(rxFileName)[0];
-        if (!fs.existsSync(dir)){
-          fs.mkdirSync(dir);
+
+        //console.log(content);
+        //console.log(fileName);
+        if(tablesAsModules.length){
+          fileMatch = tablesAsModules.some((table) => table.toLowerCase() === fileName.toLowerCase());
         }
+
+        console.log(fileMatch, fileName);
+
+        if (!fs.existsSync(directory)){
+          fs.mkdirSync(directory);
+        }
+
+        if (fileMatch){
+          fs.mkdirSync( `${directory}/${fileName}`);
+        }
+
         fs.writeFile(
-          `${dir}/${fileName}.js`, 
+          fileMatch ? `${directory}/${fileName}/${directory}.${fileName}.js` : `${directory}/${fileName}.js`, 
           `export default ${content}`, 
           {flag: 'w'}, 
           error => { 
@@ -63,7 +78,7 @@ function buildModules(tomlPaths, dir, callback){
       { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
     );
     fs.writeFile(
-      `${dir}/index.js`, 
+      `${directory}/index.js`, 
       moduleExport,
       {flag: 'w'}, 
       error => {
@@ -73,11 +88,13 @@ function buildModules(tomlPaths, dir, callback){
       }
     );
     fs.writeFile(
-      `${dir}/content.json`, 
+      `${directory}/content.json`, 
       json, 
       {flag: 'w'}, 
       error => {
-        callback(jsonObj);
+        if(complete){
+          complete(jsonObj)
+        }
         if (error) {
           console.log('error');
         }
@@ -88,5 +105,5 @@ function buildModules(tomlPaths, dir, callback){
 }
 
 function myFunction(data){
-  console.log('done', data);
+  console.log('done');
 }
