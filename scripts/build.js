@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const concat = require('concat-stream');
 const glob = require('glob');
@@ -40,17 +40,20 @@ function buildModules(tomlPaths, options){
         }
 
         console.log(fileMatch, fileName);
-
+        
         if (!fs.existsSync(directory)){
           fs.mkdirSync(directory);
         }
 
-        if (fileMatch){
+        //fs.emptyDirSync(directory)
+
+        if (fileMatch && !fs.existsSync(`${directory}/${fileName}`)){
           fs.mkdirSync( `${directory}/${fileName}`);
+          console.log(content)
         }
 
         fs.writeFile(
-          fileMatch ? `${directory}/${fileName}/${directory}.${fileName}.js` : `${directory}/${fileName}.js`, 
+          fileMatch ? `${directory}/${fileName}.js` : `${directory}/${fileName}.js`, 
           `export default ${content}`, 
           {flag: 'w'}, 
           error => { 
