@@ -20,7 +20,6 @@ glob('toml/*.toml', {
 function buildModules(tomlPaths, options){
   let { directory = null, tablesAsModules = [], complete = null } = options;
   const rxFileName = /([^\/]+)(?=\.\w+$)/;
-  let files = [];
 
   const writeToml = tomlPaths.map((path) => {
     return new Promise(function(resolve, reject){
@@ -50,9 +49,9 @@ function buildModules(tomlPaths, options){
         }
 
         if(fileMatch){
-          console.log('here', content);
+          //console.log('here', content);
           const writeTomlTable = Object.keys(JSON.parse(content)).map((table) => {
-            console.log(table)
+            //console.log(table)
             return new Promise(function(resolve, reject){
               const tableContent = beautify(`${JSON.stringify( JSON.parse(content)[table] )}`,{ end_with_newline: true, indent_size: 2, space_in_empty_paren: true});
               fs.writeFile(
@@ -63,13 +62,13 @@ function buildModules(tomlPaths, options){
                   if (error) {
                     reject(error);
                   }
-                  resolve();
+                  resolve([fileName, table]);
                 }
               );
             });
           });
-          Promise.all(writeTomlTable).then(() => {
-            resolve();
+          Promise.all(writeTomlTable).then((arr) => {
+            resolve(arr);
           });
         } else{
           fs.writeFile(
@@ -80,27 +79,27 @@ function buildModules(tomlPaths, options){
               if (error) {
                 reject(error);
               }
-              resolve();
+              resolve([fileName]);
             }
           );
         }
-        files.push({content, fileName});
       }));
     });
   });
-  Promise.all(writeToml).then(() => {
+  Promise.all(writeToml).then((files) => {
     let jsonObj = {};
     let json = '';
     let moduleExport = '';
-    
-    files.forEach( jsModule => {
-      moduleExport += `export { default as ${jsModule.fileName} } from './${jsModule.fileName}.js'\n`;
-      jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
+    console.log(files)
+    files.forEach( (jsModule) => {
+     // console.log(jsModule);
+      moduleExport += `export { default as ${jsModule[0]} } from './${jsModule[0]}.js'\n`;
+      //jsonObj[jsModule.fileName] = JSON.parse(jsModule.content);
     });
-    json = beautify(
-      JSON.stringify(jsonObj),
-      { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
-    );
+    // json = beautify(
+    //   JSON.stringify(jsonObj),
+    //   { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
+    // );
     fs.writeFile(
       `${directory}/index.js`, 
       moduleExport,
@@ -111,19 +110,19 @@ function buildModules(tomlPaths, options){
         }
       }
     );
-    fs.writeFile(
-      `${directory}/content.json`, 
-      json, 
-      {flag: 'w'}, 
-      error => {
-        if(complete){
-          complete(jsonObj)
-        }
-        if (error) {
-          //console.log('error');
-        }
-      }
-    );
+    // fs.writeFile(
+    //   `${directory}/content.json`, 
+    //   json, 
+    //   {flag: 'w'}, 
+    //   error => {
+    //     if(complete){
+    //       complete(jsonObj)
+    //     }
+    //     if (error) {
+    //       //console.log('error');
+    //     }
+    //   }
+    // );
 
   });
 }
