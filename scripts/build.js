@@ -22,9 +22,10 @@ function buildModules(tomlPaths, options){
   const rxFileName = /([^\/]+)(?=\.\w+$)/;
   let files = [];
 
-  const actions = tomlPaths.map(path => {
+  const writeToml = tomlPaths.map((path) => {
     return new Promise(function(resolve, reject){
-      fs.createReadStream(path, 'utf8').pipe(concat( data => {
+      fs.createReadStream(path, 'utf8').pipe(concat( (data) => {
+        // generate formatted content per toml file
         let content = beautify(
           `${JSON.stringify(toml.parse(data))}`,
           { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
@@ -33,41 +34,61 @@ function buildModules(tomlPaths, options){
         let fileMatch = false;
         const fileName = path.match(rxFileName)[0];
 
-        //console.log(content);
-        //console.log(fileName);
+        // see if the toml file requires additional modules
         if(tablesAsModules.length){
           fileMatch = tablesAsModules.some((table) => table.toLowerCase() === fileName.toLowerCase());
         }
 
-        console.log(fileMatch, fileName);
+        //console.log(fileMatch, fileName);
         
         if (!fs.existsSync(directory)){
           fs.mkdirSync(directory);
         }
 
-        //fs.emptyDirSync(directory)
-
         if (fileMatch && !fs.existsSync(`${directory}/${fileName}`)){
-          fs.mkdirSync( `${directory}/${fileName}`);
-          console.log(content)
+          fs.mkdirSync(`${directory}/${fileName}`);
         }
 
-        fs.writeFile(
-          fileMatch ? `${directory}/${fileName}.js` : `${directory}/${fileName}.js`, 
-          `export default ${content}`, 
-          {flag: 'w'}, 
-          error => { 
-            if (error) {
-              reject(error);
-            }
+        if(fileMatch){
+          console.log('here', content);
+          const writeTomlTable = Object.keys(JSON.parse(content)).map((table) => {
+            console.log(table)
+            return new Promise(function(resolve, reject){
+              const tableContent = beautify(`${JSON.stringify( JSON.parse(content)[table] )}`,{ end_with_newline: true, indent_size: 2, space_in_empty_paren: true});
+              fs.writeFile(
+                `${directory}/${fileName}/${table}.js`, 
+                `export default ${tableContent}`, 
+                {flag: 'w'}, 
+                error => { 
+                  if (error) {
+                    reject(error);
+                  }
+                  resolve();
+                }
+              );
+            });
+          });
+          Promise.all(writeTomlTable).then(() => {
             resolve();
-          }
-        );
+          });
+        } else{
+          fs.writeFile(
+            `${directory}/${fileName}.js`, 
+            `export default ${content}`, 
+            {flag: 'w'}, 
+            error => { 
+              if (error) {
+                reject(error);
+              }
+              resolve();
+            }
+          );
+        }
         files.push({content, fileName});
       }));
     });
   });
-  Promise.all(actions).then(() => {
+  Promise.all(writeToml).then(() => {
     let jsonObj = {};
     let json = '';
     let moduleExport = '';
@@ -86,7 +107,7 @@ function buildModules(tomlPaths, options){
       {flag: 'w'}, 
       error => {
         if (error) {
-          console.log('error');
+         // console.log('error');
         }
       }
     );
@@ -99,7 +120,7 @@ function buildModules(tomlPaths, options){
           complete(jsonObj)
         }
         if (error) {
-          console.log('error');
+          //console.log('error');
         }
       }
     );
