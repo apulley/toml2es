@@ -1,3 +1,7 @@
 [forms]
 continue = "Please Continue"
 submit = "Submit"
+
+[yoyo]
+continue = "Please Continue"
+submit = "Submit"

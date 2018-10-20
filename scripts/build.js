@@ -1,15 +1,20 @@
 const fs = require('fs-extra');
+const gfs = require('graceful-fs');
+const rimraf = require('rimraf');
 const path = require('path');
 const concat = require('concat-stream');
 const glob = require('glob');
 const toml = require('@iarna/toml');
 const beautify = require('js-beautify').js;
 
-glob('toml/*.toml', {
-  nodir: true,
-}, function(err, files){
-    buildModules(files, {directory: 'content', complete: myFunction, tablesAsModules:['page']});
-});
+
+rimraf('content',()=>{
+  glob('toml/*.toml', {
+    nodir: true,
+  }, function(err, files){
+      buildModules(files, {directory: 'content', complete: myFunction, tablesAsModules:['actions']});
+  });
+})
 
 /**
  * Parse toml files from array of paths and output into a directory. 
@@ -38,13 +43,11 @@ function buildModules(tomlPaths, options){
           fileMatch = tablesAsModules.some((table) => table.toLowerCase() === fileName.toLowerCase());
         }
 
-        //console.log(fileMatch, fileName);
-        
         if (!fs.existsSync(directory)){
           fs.mkdirSync(directory);
         }
 
-        if (fileMatch && !fs.existsSync(`${directory}/${fileName}`)){
+        if (fileMatch){
           fs.mkdirSync(`${directory}/${fileName}`);
         }
 
