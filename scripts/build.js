@@ -97,7 +97,6 @@ function buildModules(tomlPaths, directory, options){
         files.push(file);
       }
     });
-    //console.log(files)
     files.forEach( (jsModule) => {
       moduleExport += `export { default as ${(jsModule.length > 1) ? jsModule[0]+jsModule[1].charAt(0).toUpperCase() + jsModule[1].slice(1) : jsModule[0]} } from './${(jsModule.length > 1) ? jsModule[0] + '/' + jsModule[1] : jsModule[0]}.js'\n`;
     });
