@@ -86,8 +86,6 @@ function buildModules(tomlPaths, options){
     });
   });
   Promise.all(writeToml).then((arr) => {
-    let jsonObj = {};
-    let json = '';
     let moduleExport = '';
     let files = [];
 
@@ -100,7 +98,6 @@ function buildModules(tomlPaths, options){
     });
     //console.log(files)
     files.forEach( (jsModule) => {
-      //console.log(jsModule)
       moduleExport += `export { default as ${(jsModule.length > 1) ? jsModule[0]+jsModule[1].charAt(0).toUpperCase() + jsModule[1].slice(1) : jsModule[0]} } from './${(jsModule.length > 1) ? jsModule[0] + '/' + jsModule[1] : jsModule[0]}.js'\n`;
     });
     fs.writeFile(
