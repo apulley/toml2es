@@ -10,7 +10,7 @@ rimraf('content', () => {
   glob('toml/*.toml', {
     nodir: true,
   }, function(err, files){
-      buildModules(files, {directory: 'content', complete: myFunction, tablesAsModules:['actions']});
+      buildModules(files, 'content', {complete: myFunction, tablesAsModules:['actions', 'page']});
   });
 })
 
@@ -18,10 +18,11 @@ rimraf('content', () => {
  * Parse toml files from array of paths and output into a directory. 
  *
  * @param {Array} tomlPaths
- * @param {directory: String, tablesAsModules: Array, complete: Function} options
+ * @param {String} directory
+ * @param {tablesAsModules: Array, complete: Function} options
  */
-function buildModules(tomlPaths, options){
-  let { directory = null, tablesAsModules = [], complete = null } = options;
+function buildModules(tomlPaths, directory, options){
+  let { tablesAsModules = [], complete = null } = options;
   const rxFileName = /([^\/]+)(?=\.\w+$)/;
 
   const writeToml = tomlPaths.map((path) => {
