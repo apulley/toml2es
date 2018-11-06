@@ -23,6 +23,7 @@ rimraf('content', () => {
  */
 function buildModules(tomlPaths, directory, options){
   let { tablesAsModules = [], complete = null } = options;
+  let allContent = {};
   const rxFileName = /([^\/]+)(?=\.\w+$)/;
 
   const writeToml = tomlPaths.map((path) => {
@@ -37,6 +38,7 @@ function buildModules(tomlPaths, directory, options){
         let fileMatch = false;
         const fileName = path.match(rxFileName)[0];
 
+        allContent[fileName] = JSON.parse(content);
         // see if the toml file requires additional modules
         if(tablesAsModules.length){
           fileMatch = tablesAsModules.some((table) => table.toLowerCase() === fileName.toLowerCase());
@@ -53,10 +55,12 @@ function buildModules(tomlPaths, directory, options){
         if(fileMatch){
           const writeTomlTable = Object.keys(JSON.parse(content)).map((table) => {
             return new Promise(function(resolve, reject){
-              const tableContent = beautify(`${JSON.stringify( JSON.parse(content)[table] )}`,{ end_with_newline: true, indent_size: 2, space_in_empty_paren: true});
+              const tableContent = JSON.stringify(JSON.parse(content)[table]);
+              //console.log(tableContent)
+              
               fs.writeFile(
                 `${directory}/${fileName}/${table}.js`, 
-                `export default ${tableContent}`, 
+                `export default ${ beautify(tableContent,{ end_with_newline: true, indent_size: 2, space_in_empty_paren: true}) }`, 
                 {flag: 'w'}, 
                 error => { 
                   if (error) {
@@ -105,6 +109,7 @@ function buildModules(tomlPaths, directory, options){
       moduleExport,
       {flag: 'w'}, 
       error => {
+        complete && complete(allContent);
         if (error) {
           console.log('error');
         }
@@ -115,4 +120,9 @@ function buildModules(tomlPaths, directory, options){
 
 function myFunction(data){
   console.log('done');
+  console.log(data);
+}
+
+function replaceKeys (){
+  
 }
