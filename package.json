@@ -2,8 +2,7 @@
   "name": "toml2es",
   "main": "src/toml2es.js",
   "scripts": {
-    "build": "node scripts/build.js",
-    "prefix": "node scripts/prefix.js"
+    "build": "node example/example.js"
   },
   "devDependencies": {
     "@iarna/toml": "^2.2.0",
