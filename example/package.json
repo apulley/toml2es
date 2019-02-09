@@ -1,0 +1,10 @@
+{
+  "name": "my-project",
+  "scripts": {
+    "build": "node example.js"
+  },
+  "devDependencies": {
+    "rimraf": "*",
+    "glob": "^7.1.3"
+  }
+}
