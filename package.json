@@ -1,17 +1,9 @@
 {
   "name": "toml2es",
   "main": "src/toml2es.js",
-  "scripts": {
-    "build": "node example/example.js"
-  },
   "devDependencies": {
     "@iarna/toml": "^2.2.0",
     "concat-stream": "^1.6.2",
-    "rimraf": "*",
-    "glob": "^7.1.3",
     "js-beautify": "^1.8.6"
-  },
-  "dependencies": {
-    "rimraf": "^2.6.2"
   }
 }

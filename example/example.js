@@ -1,6 +1,6 @@
 const rimraf = require('rimraf');
 const glob = require('glob');
-const buildModules = require('../src/toml2es');
+const buildModules = require('toml2es');
 
 rimraf('./content', () => {
   glob('./toml/*.toml', {

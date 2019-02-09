@@ -23,7 +23,6 @@ module.exports = function buildModules(tomlPaths, directory, options){
           `${JSON.stringify(toml.parse(data))}`,
           { end_with_newline: true, indent_size: 2, space_in_empty_paren: true}
         );
-        let tableModule = {};
         let fileMatch = false;
         const fileName = path.match(rxFileName)[0];
 
